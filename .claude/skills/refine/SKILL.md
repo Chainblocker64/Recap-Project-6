@@ -13,19 +13,17 @@ Take an issue number as input. If none is given, ask for one rather than guessin
 
 ## Steps
 
-1. Run `scripts/check-prerequisites.ps1`. If it exits with a non-zero code, stop and report exactly what it flagged (e.g. `gh` not installed or not authenticated) instead of proceeding.
+1. Fetch the issue with `gh issue view <number> --json number,title,body,url,state`. If `state` is not `OPEN`, stop and report this to the user rather than refining a closed issue.
 
-2. Fetch the issue with `gh issue view <number> --json number,title,body,url,state`. If `state` is not `OPEN`, stop and report this to the user rather than refining a closed issue.
+2. Read the issue body. Per `CONTRIBUTING.md`, it should already contain What / Why / Acceptance criteria sections — treat these as the raw spec.
 
-3. Read the issue body. Per `CONTRIBUTING.md`, it should already contain What / Why / Acceptance criteria sections — treat these as the raw spec.
+3. Rewrite the acceptance criteria as a checklist of statements that are concrete and test-verifiable: each one should describe an observable behavior a test could directly assert (e.g. "Creating a Goal with an empty title returns a 400" rather than "Goal creation is validated"). Avoid vague criteria ("works well," "is user-friendly"). If the issue is too thin to derive verifiable criteria from, stop and ask the user to clarify the issue rather than inventing scope.
 
-4. Rewrite the acceptance criteria as a checklist of statements that are concrete and test-verifiable: each one should describe an observable behavior a test could directly assert (e.g. "Creating a Goal with an empty title returns a 400" rather than "Goal creation is validated"). Avoid vague criteria ("works well," "is user-friendly"). If the issue is too thin to derive verifiable criteria from, stop and ask the user to clarify the issue rather than inventing scope.
+4. Create and check out the issue's feature branch: `gh issue develop <number> --checkout`. This uses GitHub's linked-branch feature and produces the `<number>-<slug>` branch name convention documented in `CONTRIBUTING.md`.
 
-5. Create and check out the issue's feature branch: `gh issue develop <number> --checkout`. This uses GitHub's linked-branch feature and produces the `<number>-<slug>` branch name convention documented in `CONTRIBUTING.md`.
+5. Create the directory `work/<number>/` if it doesn't already exist.
 
-6. Create the directory `work/<number>/` if it doesn't already exist.
-
-7. Write `work/<number>/ticket.md` with this structure:
+6. Write `work/<number>/ticket.md` with this structure:
 
    ```markdown
    # Ticket #<number>: <title>
@@ -47,6 +45,6 @@ Take an issue number as input. If none is given, ask for one rather than guessin
    - [ ] <criterion>
    ```
 
-8. Run `scripts/set-phase.ps1 -Ticket <number> -Phase "refine"` so `work-ticket` can recognize this ticket as in progress on a future run.
+7. Run `scripts/set-phase.ps1 -Ticket <number> -Phase "refine"` so `work-ticket` can recognize this ticket as in progress on a future run.
 
-9. Report back the artifact path and the branch name now checked out.
+8. Report back the artifact path and the branch name now checked out.
