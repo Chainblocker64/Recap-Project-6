@@ -1,2 +1,6 @@
-.claude/
+.claude/*
+!.claude/skills/
 claude-edits.log
+
+# per-ticket pipeline working state (artifacts passed between workflow-step skills)
+work/
