@@ -4,16 +4,16 @@ This project is built feature-by-feature through a GitHub-centric pipeline. Ever
 
 ## The loop
 
-Implementation is autonomous end-to-end - there's no plan-approval checkpoint before code gets written. The human checkpoint is the pull request.
+Each phase runs autonomously once started - there's no approval checkpoint *within* a phase (e.g. no plan-approval gate before `implement` starts writing code). But phases don't chain into each other automatically: each one stops and reports its artifact, and you explicitly confirm before the next phase begins. The one exception used to be `review`'s FAIL path auto-looping back through `implement` - that's been removed too, so every phase transition is a deliberate, confirmed step now.
 
 1. **Issue** — create a GitHub issue describing the feature/bug/chore, added to the board in `Todo`. This is the spec.
-2. **`work-ticket`** — the pipeline's entry point (a Claude Code skill). Picks up this issue, or resumes one already in progress, and dispatches through the phases below.
-3. **`refine`** — rewrites the issue's acceptance criteria so they're test-verifiable, and creates the issue's branch.
-4. **`plan`** — explores the codebase and writes an implementation plan structured as one TDD cycle (red/green) per acceptance criterion.
-5. **`implement`** — works through the plan step by step: one failing test, one minimal implementation, one commit, per step.
+2. **`work-ticket`** — the pipeline's entry point (a Claude Code skill). Picks up this issue, or resumes one already in progress, and dispatches into a single phase below - not the whole pipeline.
+3. **`refine`** — rewrites the issue's acceptance criteria so they're test-verifiable, and creates the issue's branch. Stops for you to confirm the result.
+4. **`plan`** — explores the codebase and writes an implementation plan structured as one TDD cycle (red/green) per acceptance criterion. Stops for you to confirm the result.
+5. **`implement`** — works through the plan step by step: one failing test, one minimal implementation, one commit, per step. Stops for you to confirm the result.
 6. **`review`** — independent sub-agents check the diff for general and security issues and confirm every acceptance criterion is actually met.
-   - **FAIL** — new plan steps addressing the findings are added, and the ticket loops back through `implement` automatically.
-   - **PASS** — the branch is pushed and a PR is opened. This is where you come in - there's no earlier approval gate.
+   - **FAIL** — new plan steps addressing the findings are added, and the ticket's phase rewinds so a future `implement` run picks them up - but it stops and reports rather than continuing on its own.
+   - **PASS** — the branch is pushed and a PR is opened. This is where you come in as the primary reviewer - there's no earlier approval gate.
 7. **Your review** — you review the actual code in the PR.
 8. **CI** — automated checks must pass. (Not wired up yet — see "CI gating" below.)
 9. **Merge** — squash-merge into `main` once your review and checks are green. The issue auto-closes and its board card moves to `Done`.

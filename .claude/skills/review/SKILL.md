@@ -1,6 +1,6 @@
 ---
 name: review
-description: This skill should be used when the user asks to "review ticket <number>", "review the ticket", "start review", or when advancing an implemented GitHub issue to the review step of this project's development workflow. Has independent sub-agents review the diff for general and security issues and confirm the acceptance criteria are met, writing a work/<number>/review.md verdict. FAIL extends the plan with fix steps and sends the ticket back to implement; PASS pushes the branch and opens the pull request.
+description: This skill should be used when the user asks to "review ticket <number>", "review the ticket", "start review", or when advancing an implemented GitHub issue to the review step of this project's development workflow. Has independent sub-agents review the diff for general and security issues and confirm the acceptance criteria are met, writing a work/<number>/review.md verdict. FAIL extends the plan with fix steps and rewinds the ticket's phase so a future implement run picks them up, then stops for the user to confirm before continuing; PASS pushes the branch and opens the pull request.
 ---
 
 # Review
@@ -45,6 +45,6 @@ Take an issue number as input. If none is given, ask for one rather than guessin
 
 5. Increment a `reviewAttempts` counter in `work/<number>/state.json` each time this skill runs. If this is the 4th attempt or beyond for this ticket, stop and report the situation to the user instead of looping again - don't retry indefinitely on your own.
 
-6. **If FAIL:** append new steps to `work/<number>/plan.md` addressing every unmet criterion and finding, in the same `Step N` / Test (red) / Implementation (green) format as the existing steps. Run `scripts/set-phase.ps1 -Ticket <number> -Phase "plan"` (rewinding so the next dispatch resolves to `implement`), then invoke the `implement` skill directly to work through the new steps. Once it finishes, invoke `review` again to re-check.
+6. **If FAIL:** append new steps to `work/<number>/plan.md` addressing every unmet criterion and finding, in the same `Step N` / Test (red) / Implementation (green) format as the existing steps. Run `scripts/set-phase.ps1 -Ticket <number> -Phase "plan"` (rewinding so the next dispatch resolves to `implement`). Report the verdict and the newly added plan steps back to the user, then **stop** - don't invoke `implement` automatically. The user reviews the added steps and explicitly starts the next phase themselves.
 
 7. **If PASS:** push the branch (`git push -u origin <branch>`), then open the PR with `gh pr create` - title mirroring the issue title, body containing `Closes #<number>` per `CONTRIBUTING.md`. Run `scripts/set-phase.ps1 -Ticket <number> -Phase "review"`. Report the PR URL back to the user - this is the human checkpoint in this workflow.
