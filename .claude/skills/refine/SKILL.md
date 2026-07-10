@@ -47,4 +47,6 @@ Take an issue number as input. If none is given, ask for one rather than guessin
 
 7. Run `scripts/set-phase.ps1 -Ticket <number> -Phase "refine"` so `work-ticket` can recognize this ticket as in progress on a future run.
 
-8. Report back the artifact path and the branch name now checked out.
+8. Run `scripts/move-ticket-to-status.ps1 -IssueNumber <number> -Status "In Progress"` to move the ticket's card on the board. If the script fails, report the failure but continue - a board hiccup shouldn't block the pipeline.
+
+9. Report back the artifact path and the branch name now checked out.
