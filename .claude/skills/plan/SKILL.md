@@ -15,9 +15,14 @@ Take an issue number as input. If none is given, ask for one rather than guessin
 
 1. Read `work/<number>/ticket.md`. If it doesn't exist, stop and report that this ticket hasn't been refined yet instead of guessing at its spec.
 
-2. Launch one sub-agent (Agent tool, `subagent_type: "Explore"`) to investigate the codebase for context relevant to this ticket's acceptance criteria - existing patterns, relevant files/modules, and conventions to follow when implementing them. Give it the ticket's What/Why/Acceptance criteria as background. (This is currently a single agent covering the whole ticket; a future revision may fan this out into multiple concern-specific explore agents run in parallel - don't build that now, just leave this step easy to extend.)
+2. Launch three sub-agents (Agent tool, `subagent_type: "Explore"`) in parallel - a single message with three tool calls, not sequential - each covering one concern, all given the ticket's What/Why/Acceptance criteria as background:
+   - **Existing patterns**: how similar features are structured in this codebase (file/module layout, naming conventions, how comparable functionality is organized).
+   - **Test setup**: existing test conventions, fixtures, and pytest-django configuration relevant to testing this ticket's acceptance criteria.
+   - **Data layer**: existing models, migrations, and database schema relevant to this ticket.
 
-3. Write the sub-agent's findings to `work/<number>/exploration.md`, verbatim or lightly cleaned up - this is a record of what informed the plan, not something to re-synthesize further.
+   For the earliest tickets, before any application code exists, expect these to often report back "nothing exists yet" - that's a valid finding, not a failure, and just means the plan will be establishing the pattern rather than following one.
+
+3. Write all three sub-agents' findings to `work/<number>/exploration.md`, one section per concern (Existing patterns / Test setup / Data layer), verbatim or lightly cleaned up - this is a record of what informed the plan, not something to re-synthesize further.
 
 4. Using `ticket.md` and `exploration.md`, write `work/<number>/plan.md` with one step per acceptance criterion, each describing a single red-green TDD cycle:
 
