@@ -29,4 +29,6 @@ Take an issue number as input, if given - this overrides ticket selection below.
    - Otherwise, read its `phase` field and dispatch to whichever phase comes immediately after it in the list.
    - If the recorded phase is already `review` (the last one), stop and report that this ticket has already completed the pipeline instead of guessing what comes next. (This should only be reachable here if its issue number was passed explicitly as input - step 2 already excludes finished tickets from automatic selection.)
 
-4. Invoke the resolved skill, passing the ticket number.
+4. Run `scripts/move-ticket-to-status.ps1 -IssueNumber <number> -Status "In Progress"` to move the ticket's card on the board. Safe to run whether the ticket is brand new or being resumed - moving a card that's already in "In Progress" is a no-op. If the script fails, report the failure but continue to step 5 regardless - a board hiccup shouldn't block the pipeline.
+
+5. Invoke the resolved skill, passing the ticket number.
