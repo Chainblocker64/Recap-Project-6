@@ -1,0 +1,17 @@
+[project]
+name = "recap-project-6"
+version = "0.1.0"
+description = "Learning companion Django app"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.2,<5.3",
+    "psycopg[binary]>=3.2",
+    "django-environ>=0.11",
+    "openai>=1.50",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-django>=4.9",
+]
