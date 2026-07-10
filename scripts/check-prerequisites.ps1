@@ -8,6 +8,11 @@ $Prerequisites = @(
         Name    = "gh"
         Check   = { Get-Command gh -ErrorAction SilentlyContinue }
         Install = { winget install --id GitHub.cli -e }
+    },
+    @{
+        Name    = "uv"
+        Check   = { Get-Command uv -ErrorAction SilentlyContinue }
+        Install = { winget install --id astral-sh.uv -e }
     }
 )
 
