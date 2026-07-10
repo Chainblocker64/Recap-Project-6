@@ -4,20 +4,26 @@ This project is built feature-by-feature through a GitHub-centric pipeline. Ever
 
 ## The loop
 
-1. **Issue** — create a GitHub issue describing the feature/bug/chore. This is the spec.
-2. **Plan** — Claude Code enters plan mode, reads the issue, and proposes an implementation approach.
-3. **Approve** — a human reviews and approves the plan before any code is written.
-4. **Implement** — work happens on a branch created from the issue.
-5. **PR** — open a pull request referencing the issue.
-6. **CI** — automated checks must pass. (Not wired up yet — see "CI gating" below.)
-7. **Merge** — squash-merge into `main` once checks are green. The issue auto-closes and its board card moves to `Done`.
+Implementation is autonomous end-to-end - there's no plan-approval checkpoint before code gets written. The human checkpoint is the pull request.
+
+1. **Issue** — create a GitHub issue describing the feature/bug/chore, added to the board in `Todo`. This is the spec.
+2. **`work-ticket`** — the pipeline's entry point (a Claude Code skill). Picks up this issue, or resumes one already in progress, and dispatches through the phases below.
+3. **`refine`** — rewrites the issue's acceptance criteria so they're test-verifiable, and creates the issue's branch.
+4. **`plan`** — explores the codebase and writes an implementation plan structured as one TDD cycle (red/green) per acceptance criterion.
+5. **`implement`** — works through the plan step by step: one failing test, one minimal implementation, one commit, per step.
+6. **`review`** — independent sub-agents check the diff for general and security issues and confirm every acceptance criterion is actually met.
+   - **FAIL** — new plan steps addressing the findings are added, and the ticket loops back through `implement` automatically.
+   - **PASS** — the branch is pushed and a PR is opened. This is where you come in - there's no earlier approval gate.
+7. **Your review** — you review the actual code in the PR.
+8. **CI** — automated checks must pass. (Not wired up yet — see "CI gating" below.)
+9. **Merge** — squash-merge into `main` once your review and checks are green. The issue auto-closes and its board card moves to `Done`.
 
 ## GitHub Project board
 
 The board (already created on this repo) uses GitHub's default columns:
 
 - **Todo** — issue exists, not started.
-- **In Progress** — plan approved and/or implementation underway, including while a PR is open and awaiting CI/merge.
+- **In Progress** — the pipeline (`refine` through `review`) is running, including while a PR is open and awaiting your review/CI/merge.
 - **Done** — merged, issue closed.
 
 There's no separate "In Review" column — an open PR still counts as "In Progress."

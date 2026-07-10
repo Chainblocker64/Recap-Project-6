@@ -15,7 +15,20 @@ if (-not (Test-Path $dir)) {
     New-Item -ItemType Directory -Path $dir | Out-Null
 }
 
-$state = @{ phase = $Phase } | ConvertTo-Json
-Set-Content -Path "$dir/state.json" -Value $state -Encoding utf8
+$stateFile = "$dir/state.json"
 
-Write-Host "[ok] ticket $Ticket phase set to '$Phase'"
+# Preserve any other fields already in state.json (e.g. review's reviewAttempts
+# counter) instead of clobbering the whole file with just the phase.
+$state = @{}
+if (Test-Path $stateFile) {
+    $existing = Get-Content $stateFile -Raw | ConvertFrom-Json
+    foreach ($prop in $existing.PSObject.Properties) {
+        $state[$prop.Name] = $prop.Value
+    }
+}
+
+$state["phase"] = $Phase
+
+($state | ConvertTo-Json) | Set-Content -Path $stateFile -Encoding utf8
+
+Write-Host "[ok] ticket $Ticket phase set to '$Phase' (other fields preserved)"
