@@ -25,6 +25,7 @@ jobs:
     env:
       DATABASE_URL: postgres://learning_companion:learning_companion@localhost:5432/learning_companion
       OPENAI_API_KEY: sk-unused-in-ci
+      DJANGO_SECRET_KEY: ci-secret-key
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
